@@ -16,20 +16,6 @@ struct Node {
         }
     }
 };
-bool equal (Node node1, Node node2) {
-    for (int i = 0; i < 3; i++) {
-        if (node1.oc[i] != node2.oc[i]) {
-            return false;
-        }
-        for (int j = 0; j < 3; j++) {
-            if (j != i && node1.mat[i][j] != node2.mat[i][j]) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-vector<int> norm = {0, 1, 2};
 int64_t get_inversions (Node node) {
     int64_t ans = 0;
     for (int i = 0; i < 3; i++) {
@@ -52,7 +38,7 @@ struct SegmentTree {
         }
         return node;
     }
-    void push_tag (int ind, vector<int> v) {
+    void update (int ind, vector<int> v) {
         auto cur = Node();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -64,9 +50,9 @@ struct SegmentTree {
         lazy[ind] = compose(v, lazy[ind]);
     }
     void push_down (int ind) {
-        push_tag(2 * ind + 1, lazy[ind]);
-        push_tag(2 * ind + 2, lazy[ind]);
-        lazy[ind] = norm;
+        update(2 * ind + 1, lazy[ind]);
+        update(2 * ind + 2, lazy[ind]);
+        lazy[ind] = vector<int>({0, 1, 2});
     }
     Node query (int l, int r) {
         return query(0, 0, (int)nodes.size()/2 - 1, l, r);
@@ -79,7 +65,7 @@ struct SegmentTree {
             return;
         }
         if (tl >= l && tr <= r) {
-            push_tag(dum, new_id);
+            update(dum, new_id);
             return;
         }
         push_down(dum);
@@ -105,7 +91,7 @@ struct SegmentTree {
             v.push_back(1);
         }
         nodes.resize(2 * v.size());
-        lazy.assign(nodes.size(), norm);
+        lazy.assign(nodes.size(), vector<int>({0, 1, 2}));
         build(v, 0, 0, (int)v.size() - 1);
     }
     void build (vector<int>& v, int dum, int tl, int tr) {
